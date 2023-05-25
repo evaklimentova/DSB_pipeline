@@ -61,7 +61,11 @@ In the `example_inputs` directory, there are prepared some example files for ana
 
 ## Outputs
 
-## TODO
+All outputs from all intermediate steps are included, but the most useful and informative files are:
+
+- html report containing summarization of the analysis. It includes coverage plot and viualization of number of insertions and deletions on each position of the reference.
+
+- `<PREFIX>-collapsed.sorted.sam` with aligned reads filtered to contain at least one insertion/deletion and collapsed based on their mapping profile (it's based on the position of deletions and insertions in the reference but it does not care about the read itself; if one read maps to position 1 of the reference and second read maps to position 5 of the reference but both reads have deletion od the same part of the reference, they are collapsed). Each read in the collapsed file is a representative of the whole cluster and it carries a custom `XN` flag showing the original number of reads in this cluster. This file can be viewed in a genome browser such as IGV.
 
 
 
