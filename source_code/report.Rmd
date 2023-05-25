@@ -1,0 +1,54 @@
+---
+title: "Analysis of double-strand break reparation"
+output: html_document
+params:
+  source_path: ""
+  genome_len: 200
+---
+
+```{r include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE, fig.width = 8)
+library(lattice)
+```
+
+
+
+### Coverage
+
+Coverage of the reference sequence.
+
+``` {r fig.height = 7}
+table = read.table(paste(params$source_path, "-coverage.txt", sep = ""), header = TRUE)
+if (nrow(table) == 0) {
+  print("There are no reads to plot.")
+} else { xyplot(table$Score ~ table$Position | factor(table$Name), xlab = "Position", ylab = "Coverage", cex = 0.3, xlim = c(0, params$genome_len))}
+```
+
+### Insertions
+
+The number of inserted sequences per position in the reference sequence and length of the insertion. The darker the colour square on the coordinates **x** and **y**, the more inserted sequences of the length **y** on the position **x** of the reference sequence.
+
+**I** stands for regular insertion, **S** for soft clip from 3' or 5' end of the sequence. Soft clip is a special case of the insertion/mismatch, which occurs at the end of the read. It means that a few nucleotides at the end of the read don't match the reference sequence, so the aligner trims it out as a low-quality end.
+
+```{r fig.height = 10}
+table2 = read.table(paste(params$source_path, "-insertions.txt", sep = ""), header = TRUE)
+if (nrow(table2) == 0) {
+  print("There are no insertions in the reads to visualize.")
+} else { xyplot( Length ~ Position | factor(Name) * factor(End), scales=list(relation="free"), xlab = "Position", ylab = "Length", xlim = c(0, params$genome_len), data = table2, type = c("p"), lwd = 4, alpha = 0.01, panel = panel.smoothScatter, nbin = c(200), bandwidth = c(1, 0.3))}
+```
+
+### Deletions
+
+The number of deleted sequences per position in the reference sequence and length of the deletion.
+
+**D** stands for regular deletion, **N** for deletion longer than 20 nucleotides.
+
+```{r fig.height = 8}
+table3 = read.table(paste(params$source_path, "-deletions.txt", sep = ""), header = TRUE)
+if (nrow(table3) == 0) {
+  print("There are no deletions in the reads to visualize.")
+} else {xyplot(Length ~ Position | factor(Name) * factor(Type), scales=list(relation="free"), xlab = "Position", ylab = "Length", xlim = c(0, params$genome_len), data = table3, type = c("p"), lwd = 4, alpha = 0.01, panel = panel.smoothScatter, nbin = c(200), bandwidth = c(1, 0.3))}
+    
+```
+
+
